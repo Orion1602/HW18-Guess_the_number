@@ -8,4 +8,10 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)  # a username must be unique! Two users cannot have the same username
     email = db.Column(db.String, unique=True)  # email must be unique! Two users cannot have the same email address
+    password = db.Column(db.String)
+    session_token = db.Column(db.String)
     secret_number = db.Column(db.Integer, unique=False)  # must NOT be unique across user objects
+
+
+
+#muss models heißen, das strukturiert die datenbanken
