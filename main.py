@@ -84,6 +84,16 @@ def result():
 
     return render_template("result.html", message=message)
 
+@app.route("/profile", methods=["GET"])
+def profile():
+    session_token = request.cookies.get("session_token")
+
+    user = db.query(User).filter_by(session_token=session_token).first()
+
+    if user:
+        return render_template("profile.html", user=user)
+    else:
+        return redirect(url_for("index"))
 
 if __name__ == '__main__':
     app.run()
