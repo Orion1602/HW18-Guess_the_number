@@ -95,5 +95,32 @@ def profile():
     else:
         return redirect(url_for("index"))
 
+@app.route("/profile/edit", methods=["GET", "POST"])
+def profile_edit():
+    session_token = request.cookies.get("session_token")
+
+    # get user from the database based on her/his email address
+    user = db.query(User).filter_by(session_token=session_token).first()
+
+    if request.method == "GET":
+        if user:  # if user is found
+            return render_template("profile_edit.html", user=user)
+        else:
+            return redirect(url_for("index"))
+
+    elif request.method == "POST":
+        name = request.form.get("profile-name")
+        email = request.form.get("profile-email")
+
+        # update the user object
+        user.name = name
+        user.email = email
+
+        # store changes into the database
+        db.add(user)
+        db.commit()
+
+        return redirect(url_for("profile"))
+
 if __name__ == '__main__':
     app.run()
