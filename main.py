@@ -1,4 +1,4 @@
-import random, uuid
+import random, uuid, hashlib
 from flask import Flask, render_template, request, make_response, redirect, url_for
 from models import User, db
 
@@ -24,6 +24,8 @@ def login():
     email = request.form.get("user-email")
     password = request.form.get("user-password")
 
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
     # create a secret number
     secret_number = random.randint(1, 30)
 
@@ -32,15 +34,15 @@ def login():
 
     if not user:
         # create a User object
-        user = User(name=name, email=email, secret_number=secret_number, password=password)
+        user = User(name=name, email=email, secret_number=secret_number, password=hashed_password)
 
         # save the user object into a database
         db.add(user)
         db.commit()
 
-    if password != user.password:
+    if hashed_password != user.password:
         return "WRONG PASSWORD!! Go back and try again!!"
-    elif password == user.password:
+    elif hashed_password == user.password:
         session_token = str(uuid.uuid4())#generate random session token
 
         user.session_token = session_token
