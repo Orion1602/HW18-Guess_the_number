@@ -122,5 +122,24 @@ def profile_edit():
 
         return redirect(url_for("profile"))
 
+@app.route("/profile/delete", methods=["GET", "POST"])
+def profile_delete():
+    session_token = request.cookies.get("session_token")
+
+    # get user from the database based on her/his email address
+    user = db.query(User).filter_by(session_token=session_token).first()
+
+    if request.method == "GET":
+        if user:  # if user is found
+            return render_template("profile_delete.html", user=user)
+        else:
+            return redirect(url_for("index"))
+    elif request.method == "POST":
+        # delete the user in the database
+        db.delete(user)
+        db.commit()
+
+        return redirect(url_for("index"))
+
 if __name__ == '__main__':
     app.run()
