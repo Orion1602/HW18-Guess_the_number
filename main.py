@@ -1,6 +1,12 @@
 import random, uuid, hashlib
 from flask import Flask, render_template, request, make_response, redirect, url_for
 from models import User, db
+import os
+import psycopg2
+
+DATABASE_URL = os.environ['DATABASE_URL']
+
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 app = Flask(__name__)
 db.create_all()  # create (new) tables in the database
@@ -43,7 +49,7 @@ def login():
     if hashed_password != user.password:
         return "WRONG PASSWORD!! Go back and try again!!"
     elif hashed_password == user.password:
-        session_token = str(uuid.uuid4())#generate random session token
+        session_token = str(uuid.uuid4())
 
         user.session_token = session_token
         db.add(user)
@@ -51,7 +57,7 @@ def login():
 
     # save user's email into a cookie
     response = make_response(redirect(url_for('index')))
-    response.set_cookie("session_token", session_token, httponly=True, samesite = 'Strict')
+    response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
 
     return response
 
@@ -84,6 +90,7 @@ def result():
 
     return render_template("result.html", message=message)
 
+
 @app.route("/profile", methods=["GET"])
 def profile():
     session_token = request.cookies.get("session_token")
@@ -94,6 +101,7 @@ def profile():
         return render_template("profile.html", user=user)
     else:
         return redirect(url_for("index"))
+
 
 @app.route("/profile/edit", methods=["GET", "POST"])
 def profile_edit():
@@ -122,6 +130,7 @@ def profile_edit():
 
         return redirect(url_for("profile"))
 
+
 @app.route("/profile/delete", methods=["GET", "POST"])
 def profile_delete():
     session_token = request.cookies.get("session_token")
@@ -141,17 +150,20 @@ def profile_delete():
 
         return redirect(url_for("index"))
 
+
 @app.route("/users", methods=["GET"])
 def all_users():
     users = db.query(User).all()
 
     return render_template("users.html", users=users)
 
+
 @app.route("/user/<user_id>", methods=["GET"])
 def user_details(user_id):
     user = db.query(User).get(int(user_id))  # .get() can help you query by the ID
 
     return render_template("user_details.html", user=user)
+
 
 if __name__ == '__main__':
     app.run()
