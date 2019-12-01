@@ -1,12 +1,10 @@
-import random, uuid, hashlib
+import hashlib
+import random
+import uuid
+
 from flask import Flask, render_template, request, make_response, redirect, url_for
+
 from models import User, db
-import os
-import psycopg2
-
-DATABASE_URL = os.environ['DATABASE_URL']
-
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 app = Flask(__name__)
 db.create_all()  # create (new) tables in the database
