@@ -141,5 +141,17 @@ def profile_delete():
 
         return redirect(url_for("index"))
 
+@app.route("/users", methods=["GET"])
+def all_users():
+    users = db.query(User).all()
+
+    return render_template("users.html", users=users)
+
+@app.route("/user/<user_id>", methods=["GET"])
+def user_details(user_id):
+    user = db.query(User).get(int(user_id))  # .get() can help you query by the ID
+
+    return render_template("user_details.html", user=user)
+
 if __name__ == '__main__':
     app.run()
